@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 
-function createDir(file) {    
+function createDir(file) {
     let filePath = file.substr(0, file.lastIndexOf('/'));
 
     if (!fs.existsSync(filePath)) {

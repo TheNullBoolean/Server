@@ -7,6 +7,7 @@ import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
 import { Logger } from './util/Logger';
 import * as cookieParser from 'cookie-parser';
+import { launcherRoutes } from './api/launcher';
 
 export interface CustomResponse extends Response {
   sessionId?: string | number;
@@ -63,9 +64,8 @@ export class WebServer {
       res.status(200).send('API Online');
     });
 
-    this.app.post("/launcher/profile/login", (req: Request, res: CustomResponse) => {
-      deflate(res, '1');
-    });
+    // Launcher Routes
+    launcherRoutes(this.app);
   }
 }
 
