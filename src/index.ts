@@ -8,9 +8,6 @@ import { watermark } from "./core/util";
 process.stdout.setEncoding('utf8');
 process.title = "EmuTarkov Server";
 
-const settings = container.resolve(Settings);
-const cachce = new Cache();
-
 // We don't really need to setup routes anymore
 // /* setup routes and cache */
 // const route = require('./server/route.js');
@@ -21,6 +18,8 @@ const cachce = new Cache();
 // global.events = require('./server/events.js');
 // global.server = (require('./server/server.js').server);
 
-const server = new WebServer('127.0.0.1', 443);
+// Verify our cache or rebuild it
+const cachce = new Cache();
 
 watermark();
+const server = new WebServer();

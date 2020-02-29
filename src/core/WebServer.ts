@@ -8,27 +8,42 @@ import { container } from 'tsyringe';
 import { Logger } from './util/Logger';
 import * as cookieParser from 'cookie-parser';
 import { launcherRoutes } from './api/launcher';
+import { clientRoutes } from './api/client';
+import { Database } from './Database';
+import { missingCacheRoutes } from './callback/missing';
+import { Settings } from './Settings';
 
 export interface CustomResponse extends Response {
   sessionId?: string | number;
+  nullResponse?: any;
 }
 
 export class WebServer {
-
   app: any;
   logger: Logger;
+  db: Database;
+  settings: Settings;
 
-  constructor(ip: string, port: number) {
+  constructor() {
     // Grab our singleton instance of logger
     this.logger = container.resolve(Logger);
+    this.db = container.resolve(Database);
+    this.settings = container.resolve(Settings);
+    
+    // TODO: this sorta replaces startCallbacks
+    // but I don't think this will work very well
+    // need to come up with a better implementation
+    // - can we not store these in the Cache class directly?
+    missingCacheRoutes();
 
     // Create our REST API Container
     this.app = express();
 
     this.initExpress();
 
-    https.createServer(generateCertifcate(ip), this.app)
-    .listen(port, ip, () => {
+    https.createServer(generateCertifcate(this.settings.server.ip), this.app)
+    .listen(this.settings.server.httpsPort, this.settings.server.ip, () => {
+      this.settings.server.backendUrl = `https://${this.settings.server.ip}:${this.settings.server.httpsPort}`;
       this.logger.logSuccess("Started server");
     });
   }
@@ -42,13 +57,31 @@ export class WebServer {
       const sessionId = req.cookies.PHPSESSID || -1;
       res.cookie('PHPSESSID', sessionId);
 
-      this.logger.logRequest(`[${sessionId}][${req.connection.remoteAddress}] ${req.url}`);
+      // Create a null response object to easily forward back if we need to
+      res.nullResponse = {
+        err: 0,
+        errmsg: null,
+        data: null,
+      }
+
+      this.logger.logRequest(`[${req.method}][${sessionId}][${req.connection.remoteAddress}] ${req.url}`);
 
       if (req.method === "POST") {
         req.on('data', (data: Buffer) => {
           zlib.inflate(data, (err, body) => {
-            body ? req.body = JSON.parse(body.toString()) : req.body = {};
-            next();
+            if (body) {
+              try {
+                req.body = JSON.parse(body.toString());
+                return next();
+              } catch {
+                req.body = body.toString();
+
+                return next();
+              }
+            }
+
+            req.body = {};
+            return next();
           });
         });
 
@@ -66,14 +99,19 @@ export class WebServer {
 
     // Launcher Routes
     launcherRoutes(this.app);
+    clientRoutes(this.app);
   }
 }
 
-export function deflate(res: CustomResponse, data: string) {
+export function deflate(res: CustomResponse, data: any) {
   res.setHeader('content-encoding', 'deflate');
   res.setHeader('content-type', 'application/json');
 
-  zlib.deflate(data, function (err, buf) {
-    res.status(200).send(buf);
+  if (typeof data === 'object') {
+    data = JSON.stringify(data);
+  }
+
+  zlib.deflate(data, (err, buf) => {
+    res.send(buf);
   });
 }

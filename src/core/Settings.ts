@@ -108,4 +108,5 @@ interface Server {
   httpsPort: number;
   eventPollIntervalSec: number;
   rebuildCache: boolean;
+  backendUrl?: string;
 }
