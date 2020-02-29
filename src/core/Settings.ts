@@ -8,6 +8,9 @@ export class Settings {
   autosave!: Autosave;
   gameplay!: Gameplay;
   mods!: Mods;
+
+  version = 'dev-r23.1';
+  discord = 'https://www.discord.gg/jv7X8wC';
   
   constructor() {
     // Init our settings 

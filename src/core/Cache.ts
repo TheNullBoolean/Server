@@ -52,8 +52,7 @@ export class Cache {
       this.loadAllMods();
       
       this.db.save();
-      // this.dump();
-      // json.write("user/cache/res.json", res);
+      this.res.save();
       
       return;
     }

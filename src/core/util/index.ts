@@ -1,5 +1,9 @@
 "use strict";
 
+import { Logger } from "./Logger";
+import { container } from 'tsyringe';
+import { Settings } from "../Settings";
+
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -121,39 +125,42 @@ export function getLocalIpAddress() {
     return address;
 }
 
-// export function watermark() {
-//     let text_1 = "EmuTarkov " + server.version;
-//     let text_2 = "https://www.discord.gg/jv7X8wC";
-//     let diffrence = Math.abs(text_1.length - text_2.length);
-//     let whichIsLonger = ((text_1.length >= text_2.length) ? text_1.length : text_2.length);
-//     let box_spacing_between_1 = "";
-//     let box_spacing_between_2 = "";
-//     let box_width = "";
+export function watermark() {
+    const logger = container.resolve(Logger);
+    const settings = container.resolve(Settings);
 
-//     /* calculate space */
-//     if (text_1.length >= text_2.length) {
-//         for (let i = 0; i < diffrence; i++) {
-//             box_spacing_between_2 += " ";
-//         }
-//     } else {
-//         for (let i = 0; i < diffrence; i++) {
-//             box_spacing_between_1 += " ";
-//         }
-//     }
+    let text_1 = `EmuTarkov ${settings.version}`;
+    let text_2 = settings.discord;
+    let diffrence = Math.abs(text_1.length - text_2.length);
+    let whichIsLonger = ((text_1.length >= text_2.length) ? text_1.length : text_2.length);
+    let box_spacing_between_1 = "";
+    let box_spacing_between_2 = "";
+    let box_width = "";
 
-//     for (let i = 0; i < whichIsLonger; i++) {
-//         box_width += "═";
-//     }
+    /* calculate space */
+    if (text_1.length >= text_2.length) {
+        for (let i = 0; i < diffrence; i++) {
+            box_spacing_between_2 += " ";
+        }
+    } else {
+        for (let i = 0; i < diffrence; i++) {
+            box_spacing_between_1 += " ";
+        }
+    }
 
-//     /* reset cursor to begin */
-//     process.stdout.write('\u001B[2J\u001B[0;0f');
+    for (let i = 0; i < whichIsLonger; i++) {
+        box_width += "═";
+    }
 
-//     /* show watermark */
-//     logger.logRequest("╔═" + box_width + "═╗");
-//     logger.logRequest("║ " + text_1 + box_spacing_between_1 + " ║");
-//     logger.logRequest("║ " + text_2 + box_spacing_between_2 + " ║");
-//     logger.logRequest("╚═" + box_width + "═╝");
+    /* reset cursor to begin */
+    process.stdout.write('\u001B[2J\u001B[0;0f');
 
-//     /* set window name */
-//     process.title = text_1;
-// }
+    /* show watermark */
+    logger.logRequest("╔═" + box_width + "═╗");
+    logger.logRequest("║ " + text_1 + box_spacing_between_1 + " ║");
+    logger.logRequest("║ " + text_2 + box_spacing_between_2 + " ║");
+    logger.logRequest("╚═" + box_width + "═╝");
+
+    /* set window name */
+    process.title = text_1;
+}
