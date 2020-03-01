@@ -61,7 +61,7 @@ describe('Client', function() {
       let res = await send(url, port, path, data);
       const jsonData = parseData(res);
 
-      Object.keys(jsonData).should.include('profileId');
+      jsonData.should.equal(1);
     });
   });
 

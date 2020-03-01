@@ -16,6 +16,7 @@ import { Settings } from './Settings';
 export interface CustomResponse extends Response {
   sessionId?: string | number;
   nullResponse?: any;
+  response?: any;
 }
 
 export class WebServer {
@@ -62,6 +63,13 @@ export class WebServer {
         err: 0,
         errmsg: null,
         data: null,
+      }
+
+      res.response = (data: any) => {
+        return {
+          ...res.nullResponse,
+          data,
+        };
       }
 
       this.logger.logRequest(`[${req.method}][${sessionId}][${req.connection.remoteAddress}] ${req.url}`);
