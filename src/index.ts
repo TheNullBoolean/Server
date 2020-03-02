@@ -20,7 +20,7 @@ process.title = "EmuTarkov Server";
 // global.server = (require('./server/server.js').server);
 
 // Verify our cache or rebuild it
-const cachce = new Cache();
+const cache = new Cache();
 
 watermark();
 const server = new Server();
