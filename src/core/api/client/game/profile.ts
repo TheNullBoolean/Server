@@ -1,21 +1,19 @@
 import { CustomResponse, deflate } from "../../../WebServer";
 import { Request } from "express";
 import { container } from 'tsyringe';
-import { Database } from "../../../Database";
-import { JsonManager } from "../../../util/JsonManager";
-import { Accounts } from "../../../Accounts";
+import { Server } from "../../../Server";
 
 export const getProfileList = (req: Request, res: CustomResponse) => {
-  const account = container.resolve(Accounts);
+  const server = container.resolve(Server);
 
-  // deflate(res, res.response(JsonManager.read(db.user.cache.items)));
+  // Get our account
+  const account = server.accounts[res.sessionId];
+  const data = [];
 
-  // if (account.isWiped(sessionID)) {
-  //   output.data.push(profile_f.profileServer.getPmcProfile(sessionID));
-  //   output.data.push(profile_f.profileServer.getScavProfile(sessionID));
-  // }
+  if (!account.wipe) {
+    data.push(server.profiles[res.sessionId].pmc);
+    data.push(server.profiles[res.sessionId].scav);
+  }
 
-  // return json.stringify(output);
-
-  // TODO
+  deflate(res, res.response(data));
 }

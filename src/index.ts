@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { Settings } from "./core/Settings";
 import { Cache } from './core/Cache';
 import { watermark } from "./core/util";
+import { Server } from "./core/Server";
 
 process.stdout.setEncoding('utf8');
 process.title = "EmuTarkov Server";
@@ -22,4 +23,5 @@ process.title = "EmuTarkov Server";
 const cachce = new Cache();
 
 watermark();
-const server = new WebServer();
+const server = new Server();
+const webServer = new WebServer();

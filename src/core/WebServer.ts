@@ -14,7 +14,7 @@ import { missingCacheRoutes } from './callback/missing';
 import { Settings } from './Settings';
 
 export interface CustomResponse extends Response {
-  sessionId?: string | number;
+  sessionId: string;
   nullResponse?: any;
   response?: any;
 }
@@ -57,6 +57,7 @@ export class WebServer {
     this.app.use((req: Request, res: CustomResponse, next: NextFunction) => {
       const sessionId = req.cookies.PHPSESSID || -1;
       res.cookie('PHPSESSID', sessionId);
+      res.sessionId = sessionId;
 
       // Create a null response object to easily forward back if we need to
       res.nullResponse = {

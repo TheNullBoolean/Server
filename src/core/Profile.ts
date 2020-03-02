@@ -1,49 +1,37 @@
 import { singleton, container } from "tsyringe";
 import { Database } from "./Database";
 import { JsonManager } from "./util/JsonManager";
+import { Bots } from "./game/Bots";
 
-// TODO: Replace this with a typescript function or class
-const generatePlayerScav = require('../../old/src/classes/bots');
-
-@singleton()
-export class Profiles {
+export class Profile {
   
+  sessionId: string;
+  pmc: any;
+  scav: any;
   database: Database;
-  profiles: any = {};
   
-  constructor() {
+  constructor(sessionId: string) {
+    this.sessionId = sessionId;
     this.database = container.resolve(Database);
+
+    this.pmc = JsonManager.read(this.getPath());
+    this.generateScav();
   }
 
-  initializeProfile(sessionId: string) {
-    this.profiles[sessionId] = {
-      pmc: JsonManager.read(this.getPath(sessionId)),
-      scav: 
-    };
+  private getPath(): string {
+    return this.database.user.profiles.character.replace('__REPLACEME__', this.sessionId);
   }
 
-  getPath(sessionId: string) {
-    return this.database.user.profiles.character.replace('__REPLACEME__', sessionId);
-  }
+  private generateScav(): void {
+    let scavData = Bots.generatePlayerScav(this.sessionId);
+    scavData._id = this.pmc.savage;
+    scavData.aid = this.sessionId;
 
-  getOpenSessions() {
-    return Object.keys(this.profiles);
-  }
-
-  generateScav(sessionId: string) {
-      let pmcData = this.profiles[sessionId].pmc;
-      let scavData = generatePlayerScav();
-
-      scavData._id = pmcData.savage;
-      scavData.aid = sessionId;
-
-      return scavData;
+    this.scav = scavData;
   }
   
-  save(sessionId: string) {
-    if (this.profiles[sessionId] && this.profiles[sessionId].pmc) {
-      JsonManager.write(this.getPath(sessionId), this.profiles[sessionId].pmc);
-    }
+  public save(): void {
+    JsonManager.write(this.getPath(), this.pmc);
   }
   
 }

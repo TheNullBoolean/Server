@@ -5,6 +5,7 @@ import { keepalive } from "./game/keepalive";
 import { getItems } from "./items";
 import { getGlobals } from "./globals";
 import { getLocations } from "./locations";
+import { getProfileList } from "./game/profile";
 
 export const clientRoutes = (app: any) => {
   // client
@@ -19,4 +20,5 @@ export const clientRoutes = (app: any) => {
   // client/game
   app.post("/client/game/version/validate", validateVersion);
   app.post("/client/game/keepalive", keepalive);
+  app.post("/client/game/profile/list", getProfileList);
 }

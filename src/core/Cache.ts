@@ -4,8 +4,8 @@ import { getDirList } from './util';
 import { Logger } from './util/Logger';
 import { Settings } from './Settings';
 import { JsonManager } from './util/JsonManager';
-import { Database } from './Database';
 import { Resources } from './Resources';
+import { Database } from './Database';
 
 export class Cache {
   
