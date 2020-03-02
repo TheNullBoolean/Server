@@ -67,8 +67,6 @@ export class Server {
 
   private loadProfile(sessionId: string): void {
     this.profiles[sessionId] = new Profile(sessionId);
-
-    console.log(this.profiles);
   }
   
 }
